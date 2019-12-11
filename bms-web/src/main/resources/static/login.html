@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/elementUI.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/elementUI.css">
+    <script type="text/javascript" src="js/axios.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <!-- CSS Files -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/css/now-ui-kit.css?v=1.1.0" rel="stylesheet" type="text/css"/>
+    <link href="assets/css/login.css" rel="stylesheet" type="text/css"/>
+</head>
+<body class="login-page sidebar-collapse">
+<!-- End Navbar -->
+<div class="page-header" filter-color="orange">
+    <div class="page-header-image" style="background-image:url(assets/img/login.jpg)"></div>
+    <div class="container">
+        <div class="col-md-4 content-center">
+            <div class="card card-login card-plain">
+                <form class="form" method="post">
+                    <div class="header header-primary text-center" style="cursor: pointer;">
+                        <div class="logo-container">
+                            <img src="assets/img/now-logo.png" alt=""
+                                 onclick="changeBackImg(Math.floor(Math.random() * 9));">
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div class="input-group form-group-no-border input-lg">
+                                <span class="input-group-addon" style="width: 50px">
+                                    <i class="now-ui-icons users_circle-08"></i>
+                                </span>
+                            <input name="username" class="form-control" id="username" type="text" placeholder="用户名"/>
+                        </div>
+                        <div class="input-group form-group-no-border input-lg">
+                                <span class="input-group-addon" style="width: 50px">
+                                    <i class="now-ui-icons text_caps-small"></i>
+                                </span>
+                            <input name="password" type="password" id="password" class="form-control" placeholder="密码"/>
+                        </div>
+                        <!--/*@thymesVar id="needCaptcha" type="java.lang.Boolean"*/-->
+                        <div class="input-group form-group-no-border input-lg" th:if="${needCaptcha}">
+                                <span class="input-group-addon" style="width: 50px">
+                                    <i class="now-ui-icons text_caps-small"></i>
+                                </span>
+                            <label for="captcha"></label>
+                            <input type="text" name="captcha" class="form-control" id="captcha" placeholder="请输入验证码"
+                                   style="display: inline-block"/>
+                            <img style="cursor: pointer;" id="captchaImg"
+                                 onclick="this.src='/captcha?d='+new Date()*1"
+                                 src="/captcha" title="看不清，点击换一张" alt=""/>
+                        </div>
+                    </div>
+                    <div id="form" style="color: red;margin: -20px;">{{errMsg}}</div>
+                    <div class="footer text-center">
+                        <input value="登录" onclick="submitForm()" type="button" class="btn btn-primary btn-round btn-lg btn-block"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<el-drawer
+        id="drawer"
+        title="修改密码"
+        :visible.sync="show"
+        direction="ltr"
+        custom-class="demo-drawer"
+        ref="drawer"
+        :close-on-press-escape="false"
+        :show-close="false"
+        :wrapper-closable="false"
+>
+    <div class="demo-drawer__content">
+        <el-form :model="form" size="mini" :rules="rules" ref="form" label-position="right" label-width="120px">
+            <el-row>
+                <el-col :span="18">
+                    <el-form-item label="请输入密码" prop="password">
+                        <el-input type="password" v-model="form.password" autocomplete="off"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="18">
+                    <el-form-item label="请再次输入" prop="ensurePassword">
+                        <el-input type="password" v-model="form.ensurePassword" autocomplete="off"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+        <div class="demo-drawer__footer" align="center">
+            <el-button @click="show = false" size="mini">取 消</el-button>
+            <el-button type="primary" @click="updatePwd('form')" size="mini">确定
+            </el-button>
+        </div>
+    </div>
+</el-drawer>
+<script type="text/javascript" src="js/baseReq.js"></script>
+<script type="text/javascript" src="js/permission/login.js"></script>
+</html>

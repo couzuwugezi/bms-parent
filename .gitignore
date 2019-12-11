@@ -1,0 +1,9 @@
+# Project exclude paths
+/bms-admin/target/
+/bms-config/target/
+/bms-core/target/
+/bms-dao/target/
+/bms-util/target/
+/bms-web/target/
+/.idea/
+/logs/

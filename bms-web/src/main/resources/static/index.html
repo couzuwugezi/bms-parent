@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/elementUI.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/elementUI.css">
+    <link rel="stylesheet" type="text/css" href="css/commonality.css">
+    <script type="text/javascript" src="js/axios.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        #main {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .el-menu-vertical-demo:not(.el-menu--collapse) {
+            width: 17%;
+            min-height: 400px;
+        }
+
+        .el-card__body {
+            flex: 1;
+            height: calc(100% - 40px);
+        }
+
+        .el-tabs__content {
+            overflow-y: auto;
+            height: calc(100% - 70px);
+        }
+
+        .fa-angle-double-left {
+            content: "\f100";
+        }
+
+        .el-tab-pane {
+            height: 100%
+        }
+
+        .el-tabs__item {
+            -moz-user-select: none; /*火狐*/
+            -webkit-user-select: none; /*webkit浏览器*/
+            -ms-user-select: none; /*IE10*/
+            user-select: none;
+        }
+
+    </style>
+</head>
+<body>
+<el-container id="main" v-cloak>
+    <el-container style="height:100%">
+        <el-menu @select="handleSelect" id="menu" style="overflow: auto;" :unique-opened="true"
+                 class="el-menu-vertical-demo aside-container__menu" :collapse="isCollapse">
+            <menu-item v-for="menu in menus" :coll="coll" :menus="menu" :key="menu.name"></menu-item>
+        </el-menu>
+        <el-main style="padding-top: 10px;width: 85%;height: 100%;overflow: hidden">
+            <div style="display: inline-block;width: 100%">
+                <svg class="icon" @click="change" v-if="!this.isCollapse"
+                     style="cursor: pointer;margin-bottom: 4px;display: inline-block;width: 1em;height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"
+                     viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="469">
+                    <path d="M128.512 214.016h768v81.92h-768zM128.512 718.336h768v81.92h-768zM128.512 466.432h486.4v81.92h-486.4zM722.432 507.392l174.08 133.12v-266.24l-174.592 133.12"
+                          fill="#333333" p-id="470"></path>
+                </svg>
+                <svg class="icon" @click="change" v-if="this.isCollapse"
+                     style="cursor: pointer;margin-bottom: 4px;display: inline-block;width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"
+                     viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="607">
+                    <path d="M128.512 214.016h768v81.92h-768zM128.512 718.336h768v81.92h-768zM128.512 466.432h486.4v81.92h-486.4zM896.512 507.392l-174.592-133.12v266.24l174.08-133.12"
+                          fill="#333333" p-id="608"></path>
+                </svg>
+                <el-breadcrumb separator-class="el-icon-arrow-right" style="display: inline-block;">
+                    <el-breadcrumb-item v-if="breadcrumb.length === 0">首页</el-breadcrumb-item>
+                    <el-breadcrumb-item v-else="breadcrumb.length === 0" v-for="(item,index) in breadcrumb"
+                                        :key="index">{{item}}
+                    </el-breadcrumb-item>
+                </el-breadcrumb>
+                <div style="float: right">
+                    <svg onclick="window.location.href = '/logout'" class="icon"
+                         style="float:right;cursor: pointer;width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"
+                         viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1489">
+                        <path d="M536.094118 1017.976471H283.105882c-120.470588 0-222.870588-102.4-222.870588-222.870589V228.894118C60.235294 108.423529 162.635294 6.023529 283.105882 6.023529h252.988236c120.470588 0 222.870588 102.4 222.870588 222.870589h-60.235294c0-90.352941-72.282353-156.611765-156.611765-156.611765H283.105882c-90.352941 0-156.611765 72.282353-156.611764 156.611765v572.235294c0 90.352941 72.282353 156.611765 156.611764 156.611764h252.988236c90.352941 0 156.611765-72.282353 156.611764-156.611764h66.258824c0 114.447059-102.4 216.847059-222.870588 216.847059zM505.976471 481.882353h379.482353c18.070588 0 30.117647 12.047059 30.117647 30.117647s-12.047059 30.117647-30.117647 30.117647H505.976471c-18.070588 0-30.117647-12.047059-30.117647-30.117647s12.047059-30.117647 30.117647-30.117647zM789.082353 704.752941c-6.023529 0-12.047059 0-18.070588-6.023529-12.047059-12.047059-12.047059-30.117647 0-42.164706l126.494117-132.517647-126.494117-132.517647c-12.047059-12.047059-12.047059-30.117647 0-42.164706 12.047059-12.047059 30.117647-12.047059 42.164706 0L939.670588 481.882353c24.094118 24.094118 24.094118 66.258824 0 90.352941l-126.494117 132.517647c-6.023529-6.023529-18.070588 0-24.094118 0z"
+                              p-id="1490"></path>
+                    </svg>
+                </div>
+            </div>
+            <el-card style="width: 100%;height: calc(100% - 24px);display: flex;flex-direction: column" shadow="never">
+                <el-tabs @tab-click="tabClick" v-model="currentTabName" type="border-card"
+                         style="height: 100%;overflow: hidden" @tab-remove="removeTab">
+                    <el-tab-pane label="首页" name="home">
+                        <el-container style="height:100%">
+                            <el-menu class="el-menu-vertical-demo" @select="handleHomeSelect">
+                                <el-menu-item index="1">
+                                    <i class="el-icon-document"></i>
+                                    <span slot="title">登录日志</span>
+                                </el-menu-item>
+                                <el-menu-item index="2">
+                                    <i class="el-icon-document"></i>
+                                    <span slot="title">修改密码</span>
+                                </el-menu-item>
+                                <!--                                <el-menu-item index="3">-->
+                                <!--                                    <i class="el-icon-document"></i>-->
+                                <!--                                    <span slot="title">导航3</span>-->
+                                <!--                                </el-menu-item>-->
+                                <!--                                <el-menu-item index="4">-->
+                                <!--                                    <i class="el-icon-document"></i>-->
+                                <!--                                    <span slot="title">导航4</span>-->
+                                <!--                                </el-menu-item>-->
+                            </el-menu>
+                            <el-main style="padding-top: 10px;width: 85%;height: 100%;overflow: hidden">
+                                <el-table v-if="homeActiveIndex === '1'" :data="tableData"
+                                          border size="mini" :height="homeTableHeight"
+                                          style="width: 100%">
+                                    <el-table-column
+                                            prop="loginName"
+                                            label="操作人">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="loginIp"
+                                            label="登录ip">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="operateTime"
+                                            label="操作时间">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="operateType"
+                                            label="操作类型" :formatter="(row, column, cellValue, index)=>{
+                                                if(cellValue === '1'){
+                                                    return '登录'
+                                                }else{
+                                                    return '注销'
+                                                }
+                                            }">
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="failReason"
+                                            label="异常原因">
+                                    </el-table-column>
+                                </el-table>
+                                <el-form v-if="homeActiveIndex === '2'" :model="form" size="mini" :rules="rules"
+                                         ref="form" label-position="right" label-width="130px" style="width: 500px">
+                                    <el-row>
+                                        <el-col :span="18">
+                                            <el-form-item label="请输入初始密码" prop="oldPassword">
+                                                <el-input type="password" v-model="form.oldPassword"
+                                                          autocomplete="off"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="18">
+                                            <el-form-item label="请输入密码" prop="password">
+                                                <el-input type="password" v-model="form.password"
+                                                          autocomplete="off"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="18">
+                                            <el-form-item label="请再次输入" prop="ensurePassword">
+                                                <el-input type="password" v-model="form.ensurePassword"
+                                                          autocomplete="off"></el-input>
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-row>
+                                    <el-form-item>
+                                        <el-button type="primary" @click="updatePwd('form')" size="mini">确定
+                                        </el-button>
+                                    </el-form-item>
+                                </el-form>
+                            </el-main>
+                        </el-container>
+                    </el-tab-pane>
+                    <el-tab-pane onselectstart="return false;"
+                                 v-for="item in editableTabs"
+                                 :key="item.name"
+                                 :label="item.label"
+                                 closable
+                                 :name="item.name">
+                        <iframe :ref="item.url" width="100%" :src="item.url" frameborder="0" scrolling="auto"
+                                :height="item.height?item.height:'100%'"></iframe>
+                    </el-tab-pane>
+                </el-tabs>
+            </el-card>
+        </el-main>
+    </el-container>
+</el-container>
+</body>
+<script type="text/javascript" src="js/baseReq.js"></script>
+<script type="text/javascript" src="js/component/menuItem.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+</html>

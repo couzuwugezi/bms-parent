@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bms.project.generator.mapper.BmsLoginLogMpMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.bms.project.generator.entity.BmsLoginLogMp">
+        <id column="id" property="id" />
+        <result column="operate_time" property="operateTime" />
+        <result column="operate_type" property="operateType" />
+        <result column="login_name" property="loginName" />
+        <result column="login_ip" property="loginIp" />
+    </resultMap>
+
+</mapper>

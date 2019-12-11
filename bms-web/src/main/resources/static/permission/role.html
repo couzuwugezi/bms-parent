@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="../js/vue.js"></script>
+<script type="text/javascript" src="../js/elementUI.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/elementUI.css">
+<link rel="stylesheet" type="text/css" href="../css/commonality.css">
+<script type="text/javascript" src="../js/axios.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<style>
+    [v-cloak] {
+        display: none;
+    }
+
+    .el-card__body {
+        position: relative;
+        height: 100%;
+        box-sizing: border-box;
+    }
+</style>
+<body style="overflow-x: hidden">
+
+<div v-cloak id="role" style="overflow-x: hidden">
+    <el-row :gutter="20" type="flex" style="height: 100%">
+        <el-col :span="6">
+            <el-card shadow="never" style="height: 99%">
+                <el-tree
+                        style="max-height: calc(100% - 25px);height: 85%;
+                                position: absolute;overflow: auto;width: 92%;"
+                        ref="tree"
+                        :data="treeData"
+                        show-checkbox
+                        v-loading="treeLoading"
+                        node-key="id"
+                        default-expand-all
+                        :default-checked-keys="checkedData"
+                        :props="defaultProps">
+                </el-tree>
+                <div style="position: absolute;bottom: 12px;left:17%">
+                    <el-button-group>
+                        <el-button size="mini" type="success" round @click="bindRes">绑定资源</el-button>
+                        <el-button size="mini" type="success" round @click="reloadRes">刷新资源</el-button>
+                    </el-button-group>
+                </div>
+            </el-card>
+        </el-col>
+        <el-col :span="18">
+            <el-card shadow="never" style="height: 99%">
+                <el-form class="demo-form-inline" size="mini" v-model="queryForm" id="queryForm">
+                    <el-row :gutter="20">
+                        <el-col :span="4.5">
+                            <el-form-item>
+                                <el-input placeholder="角色名称" v-model="queryForm.name" size="mini">
+                                </el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4.5">
+                            <el-form-item>
+                                <el-select v-model="queryForm.status" clearable
+                                           placeholder="请选择状态">
+                                    <el-option label="启用" value="enabled"></el-option>
+                                    <el-option label="停用" value="disable"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4.5" style="float: right">
+                            <el-form-item>
+                                <el-button type="success" round @click="query">查 询</el-button>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row style="margin-bottom: 5px">
+                        <el-button-group style="float: right">
+                            <el-button size="mini" type="success" round @click="add">新 增</el-button>
+                            <el-button size="mini" type="success" round @click="updateStatus('enabled')">生 效</el-button>
+                            <el-button size="mini" type="success" round @click="updateStatus('disable')">失 效</el-button>
+                        </el-button-group>
+                    </el-row>
+                </el-form>
+                <el-table ref="datagrid" v-loading="loading" :data="tableData" size="mini"
+                          border :height="height" stripe fit>
+                    <el-table-column label="选择" width="70" center>
+                        <template slot-scope="scope">
+                            <el-radio class="radio" v-model="radio" :label="scope.$index"
+                                      @change.native="handleSelect(scope.row)">&nbsp;
+                            </el-radio>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label=" " type="index" width="50" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column prop="name" label="角色名" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column prop="description" label="角色描述" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column prop="status" label="状态" show-overflow-tooltip :formatter="statusFormat">
+                        <template slot-scope="scope">
+                            <el-tag :type="scope.row.status === 'enabled'?'primary':'danger'"
+                                    disable-transitions>{{scope.row.status ==='enabled'?'正常':'冻结'}}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column fixed="right" label="操作">
+                        <template slot-scope="scope">
+                            <el-button type="text" size="mini" @click="edit(scope.row)">
+                                编辑
+                            </el-button>
+                            <el-popover
+                                    placement="right"
+                                    width="255"
+                                    trigger="click">
+                                <div style="text-align: right; margin: 0">
+                                <el-select
+                                        v-model="permissionArr"
+                                        multiple
+                                        size="mini"
+                                        collapse-tags
+                                        style="margin-left: 20px;"
+                                        placeholder="请选择权限">
+                                    <el-option
+                                            v-for="item in options"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                                    <el-button type="primary" size="mini" @click="auth(scope.row.id)">确定</el-button>
+                                </div>
+                                <el-button type="text" size="mini" slot="reference" @click="loadAuth(scope.row.id)">
+                                    授权
+                                </el-button>
+                            </el-popover>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-card>
+        </el-col>
+    </el-row>
+</div>
+
+<el-dialog v-cloak :title="title" :visible.sync="visible" :close-on-click-modal="false"
+           :close-on-press-escape="false" :show-close="false" id="dialog">
+    <el-form :model="form" :inline="true" :rules="rules" ref="form" label-width="80px">
+        <el-form-item label="角色名称" prop="name">
+            <el-input v-model="form.name" size="mini" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="description">
+            <el-input v-model="form.description" size="mini" autocomplete="off" clearable></el-input>
+        </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+        <el-button type="primary" size="mini" @click="save('form')">保 存</el-button>
+        <el-button size="mini" @click="close">关 闭</el-button>
+    </div>
+</el-dialog>
+
+<script type="text/javascript" src="../js/baseReq.js"></script>
+<script type="text/javascript" src="../js/component/datagrid.js"></script>
+<script type="text/javascript" src="../js/permission/role.js"></script>
+</body>
+</html>

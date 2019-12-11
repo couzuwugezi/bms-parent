@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="../js/vue.js"></script>
+<script type="text/javascript" src="../js/elementUI.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/elementUI.css">
+<link rel="stylesheet" type="text/css" href="../css/commonality.css">
+<script type="text/javascript" src="../js/axios.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<style>
+    [v-cloak] {
+        display: none;
+    }
+</style>
+<body style="overflow-x: hidden">
+<div>
+    <div v-cloak id="queryBlock">
+        <el-form class="demo-form-inline" size="mini" v-model="searchForm">
+            <el-row :gutter="20">
+                <el-col :span="4.5">
+                    <el-form-item label="" prop="name">
+                        <el-input v-model="searchForm.name" placeholder="请输入名称" size="mini" autocomplete="off" clearable></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="4.5">
+                    <el-form-item label="" prop="type">
+                        <el-select v-model="searchForm.type" size="mini" placeholder="请选择类型" clearable>
+                            <el-option label="菜单资源" value="menu"></el-option>
+                            <el-option label="按钮资源" value="button"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="4.5">
+                    <el-form-item label="" prop="status">
+                        <el-select v-model="searchForm.status" size="mini" placeholder="请选择状态" clearable>
+                            <el-option label="正常" value="enabled"></el-option>
+                            <el-option label="冻结" value="disable"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="4.5" style="float: right">
+                    <el-form-item>
+                        <el-button type="success" round @click="query">查 询</el-button>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+        <el-row style="margin-bottom: 5px">
+            <el-button-group style="float: right">
+                <el-button size="mini" type="success" round @click="add('add')">新 增</el-button>
+            </el-button-group>
+        </el-row>
+    </div>
+    <!--===========表格==================-->
+    <el-table v-cloak :data="tableData" size="mini" :height="height" style="width: 100%;margin-bottom: 20px;" row-key="id"
+              v-loading="loading" id="datagrid"
+              border :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+        <el-table-column prop="name" label="资源名称" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="type" label="资源类型">
+            <template slot-scope="scope">
+                <el-tag :type="scope.row.type === 'menu'?'primary':'success'"
+                        disable-transitions>{{scope.row.type ==='menu'?'菜单资源':'按钮资源'}}
+                </el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态">
+            <template slot-scope="scope">
+                <el-tag :type="scope.row.status === 'enabled'?'primary':'danger'"
+                        disable-transitions>{{scope.row.status ==='enabled'?'正常':'冻结'}}
+                </el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column fixed="right" label="操作" width="200">
+            <template slot-scope="scope">
+                <el-button v-if="scope.row.status==='enabled'" type="text" size="mini"
+                           @click="changeResStatus(scope.row,'disable')">冻结
+                </el-button>
+                <el-button v-if="scope.row.status==='disable'" type="text" size="mini"
+                           @click="changeResStatus(scope.row,'enabled')">恢复
+                </el-button>
+                <el-button v-if="scope.row.type==='menu'" type="text" size="mini"
+                           @click="add('addSub',scope.row)">新增子资源
+                </el-button>
+                <el-button type="text" size="mini" @click="add('edit',scope.row)">修改</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <!--===========编辑资源信息弹窗==================-->
+    <el-dialog v-cloak :title="title" :visible.sync="visible" width="650px" :close-on-click-modal="false"
+               :close-on-press-escape="false" :show-close="false" id="dialog">
+        <el-form :model="resForm" :inline="true" :rules="resFormRules" ref="resForm" label-width="80px">
+            <el-form-item label="资源类型" prop="type">
+                <el-select v-model="resForm.type" size="mini" placeholder="请选择类型" clearable>
+                    <el-option label="菜单资源" value="menu"></el-option>
+                    <el-option label="按钮资源" value="button"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="资源名称" prop="name">
+                <el-input v-model="resForm.name" size="mini" autocomplete="off" clearable></el-input>
+            </el-form-item>
+            <el-form-item label="文件路径" prop="url">
+                <el-input v-model="resForm.url" size="mini" autocomplete="off" clearable></el-input>
+            </el-form-item>
+            <el-form-item label="排序" prop="sort">
+                <el-input-number size="mini" v-model="resForm.sort" :min="1" :precision="0"></el-input-number>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" size="mini" @click="save">保 存</el-button>
+            <el-button size="mini" @click="close">关 闭</el-button>
+        </div>
+    </el-dialog>
+
+</div>
+<script type="text/javascript" src="../js/baseReq.js"></script>
+<script type="text/javascript" src="../js/permission/resources.js"></script>
+</body>
+</html>
