@@ -39,18 +39,18 @@ let role = new Vue({
             dialog.visible = true;
         },
         loadAuth(roleId) {
-            http.post('/permission/dict/loadDicts/1').then(response => {
+            http.post(BD.realPath + '/permission/dict/loadDicts/1').then(response => {
                 const {rtnData} = response;
                 this.options = rtnData;
 
-                http.post(`/permission/dict/loadAuth/${roleId}`).then(response => {
+                http.post(BD.realPath + `/permission/dict/loadAuth/${roleId}`).then(response => {
                     const {rtnData} = response;
                     this.permissionArr = rtnData
                 })
             })
         },
         auth(roleId) {
-            http.post(`/permission/role/auth/${roleId}`, {
+            http.post(BD.realPath + `/permission/role/auth/${roleId}`, {
                 auths: this.permissionArr.join(",")
             }).then(response => {
                 const {rtnMsg} = response;
@@ -61,7 +61,7 @@ let role = new Vue({
         query() {
             let vm = this;
             vm.loading = true;
-            http.post('/permission/role/loadRoles', this.queryForm).then((response) => {
+            http.post(BD.realPath + '/permission/role/loadRoles', this.queryForm).then((response) => {
                 const {rows, total, rtnData} = response;
                 vm.tableData = rtnData;
                 vm.loading = false;
@@ -89,7 +89,7 @@ let role = new Vue({
                 return false;
             }
             let vm = this;
-            http.post("/permission/role/updateStatus", {id: this.chooseData.id, status: status}).then(response => {
+            http.post(BD.realPath + "/permission/role/updateStatus", {id: this.chooseData.id, status: status}).then(response => {
                 const {rtnMsg} = response;
                 vm.$message.success({
                     message: rtnMsg || "操作成功"
@@ -109,7 +109,7 @@ let role = new Vue({
             // let keys = nodes.map(item => {
             //     return item.id
             // });
-            http.post("/permission/role/bindRes", {id: this.chooseData.id, keys: keys.join(",")}).then(response => {
+            http.post(BD.realPath + "/permission/role/bindRes", {id: this.chooseData.id, keys: keys.join(",")}).then(response => {
                 const {rtnMsg} = response;
                 vm.$message.success({
                     message: rtnMsg || "操作成功"
@@ -119,7 +119,7 @@ let role = new Vue({
         },
         reloadRes() {
             this.treeLoading = true;
-            http.post('/permission/resource/loadEnabledResource').then(function (response) {
+            http.post(BD.realPath + '/permission/resource/loadEnabledResource').then(function (response) {
                 const {rtnData} = response;
                 role.treeLoading = false;
                 role.treeData = rtnData;
@@ -131,7 +131,7 @@ let role = new Vue({
     watch: {
         'chooseData': val => {
             if (val.id) {
-                http.post("/permission/role/loadResByRoleId", {roleId: val.id}).then(response => {
+                http.post(BD.realPath + "/permission/role/loadResByRoleId", {roleId: val.id}).then(response => {
                     const {rtnData} = response;
                     if (rtnData) {
                         role.$refs.tree.setCheckedKeys(rtnData)
@@ -188,7 +188,7 @@ let dialog = new Vue({
             let vm = this;
             this.$refs[formName].validate((valid, fields) => {
                 if (valid) {
-                    http.post('/permission/role/add', vm.form).then(response => {
+                    http.post(BD.realPath + '/permission/role/add', vm.form).then(response => {
                         const {rtnFlag, rtnMsg} = response;
                         vm.$message.success(rtnMsg);
                         role.query();

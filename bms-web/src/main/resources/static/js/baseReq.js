@@ -19,16 +19,19 @@ http.interceptors.response.use((response) => {
                 window.parent.location.href = BD.localhostPath + '/login.html';
             }
         });
+        return false;
     } else if (rtnFlag && rtnFlag === 'shiro') {
         vm.$message({
             type: "error",
             message: "当前未授权进行此操作!"
         });
+        return false;
     } else if (rtnFlag && rtnFlag !== '9999') {
         vm.$message({
             type: "error",
             message: rtnMsg || "系统异常,请联系管理员"
         });
+        return false;
     } else if (response.headers['content-type'] === "application/vnd.ms-excel;charset=utf-8") {
         let filename = response.headers['content-disposition'];
         filename = filename.replace('attachment;filename=', '');

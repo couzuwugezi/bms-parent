@@ -33,7 +33,7 @@ let datagrid = new Vue({
     methods: {
         changeResStatus(row, status) {
             let vm = this;
-            http.post(`/permission/resource/changeResStatus/${row.id}/${status}`).then(function (response) {
+            http.post(BD.realPath + `/permission/resource/changeResStatus/${row.id}/${status}`).then(function (response) {
                 const {rtnMsg} = response;
                 datagrid.$message.success(rtnMsg || '操作成功！');
                 queryBlock.query()
@@ -43,7 +43,7 @@ let datagrid = new Vue({
         },
         query(param) {
             this.loading = true;
-            http.post('/permission/resource/loadRes', param).then(function (response) {
+            http.post(BD.realPath + '/permission/resource/loadRes', param).then(function (response) {
                 const {rtnData} = response;
                 datagrid.loading = false;
                 datagrid.tableData = rtnData;
@@ -123,7 +123,7 @@ let dialog = new Vue({
                         url = '/permission/resource/editRes'
                     }
                     let form = JSON.parse(JSON.stringify(vm.resForm));
-                    http.post(url, form)
+                    http.post(BD.realPath + url, form)
                         .then(function (response) {
                             dialog.$message.success(vm.title + '成功！');
                             vm.close()

@@ -35,7 +35,7 @@ public abstract class AbstractCustomInteceptor implements HandlerInterceptor {
         int passwordEffectiveTime = shiroProperty.getPasswordEffectiveTime();
         LocalDateTime modifyPasswordTime = ((BmsAccountMp) SecurityUtils.getSubject().getPrincipal()).getModifyPasswordTime();
         long between = ChronoUnit.MONTHS.between(modifyPasswordTime.toLocalDate(), LocalDateTime.now().toLocalDate());
-        if (passwordEffectiveTime < between) {
+        if (httpServletRequest.getRequestURI().endsWith("/permission/account/uppdatePwd1") && passwordEffectiveTime < between) {
             throw new BmsException(ResponseCode.NEED_UPDATE_PWD);
         }
 

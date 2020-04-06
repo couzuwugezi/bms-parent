@@ -67,7 +67,7 @@ let main = new Vue({
                 this.editableTabs.push({
                     label: title,
                     name: name,
-                    url: index
+                    url: BD.realPath + index
                 });
                 setTimeout(() => {
                     let arr = document.getElementsByClassName('el-tabs__item');
@@ -121,7 +121,7 @@ let main = new Vue({
         updatePwd(formName) {
             this.$refs[formName].validate((valid, fields) => {
                 if (valid) {
-                    http.post('/permission/account/updatePwd1', main.form).then(response => {
+                    http.post(BD.realPath + '/permission/account/updatePwd1', main.form).then(response => {
                         const {rtnMsg} = response;
                         drawer.$message.success(rtnMsg || "操作成功");
                         drawer.show = false;
@@ -141,7 +141,7 @@ let main = new Vue({
                 ensurePassword: ''
             };
             if (val === '1') {
-                http.post('/loadLoginLog').then(response => {
+                http.post(BD.realPath + '/loadLoginLog').then(response => {
                     const {rtnData} = response;
                     main.tableData = rtnData;
                 });
@@ -150,7 +150,7 @@ let main = new Vue({
     },
     mounted() {
         let vm = this;
-        http.post('/loadMenus').then(response => {
+        http.post(BD.realPath + '/loadMenus').then(response => {
             const {rtnData} = response;
             this.menus = rtnData;
         });

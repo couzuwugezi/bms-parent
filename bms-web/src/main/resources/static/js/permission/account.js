@@ -20,7 +20,10 @@ let queryBlock = new Vue({
                 let ids = hasCheckedData.map(item => {
                     return item.id;
                 });
-                http.post("/permission/account/updateStatus", {ids: ids.join(","), status: status}).then(response => {
+                http.post(BD.realPath + "/permission/account/updateStatus", {
+                    ids: ids.join(","),
+                    status: status
+                }).then(response => {
                     const {rtnMsg} = response;
                     vm.$message.success({
                         message: rtnMsg || "操作成功"
@@ -65,7 +68,7 @@ let queryBlock = new Vue({
 let datagrid = new Vue({
     el: "#datagrid",
     data: {
-        uri: '/permission/account/loadAccounts',
+        uri: BD.realPath + '/permission/account/loadAccounts',
         height: null,
         columns: [
             {
@@ -129,7 +132,7 @@ let datagrid = new Vue({
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        http.post("/permission/account/resetPwd", {id: row.id}).then(response => {
+                        http.post(BD.realPath + "/permission/account/resetPwd", {id: row.id}).then(response => {
                             const {rtnMsg} = response;
                             datagrid.$message({
                                 type: 'success',
@@ -209,7 +212,7 @@ let dialog = new Vue({
             this.$refs[form].validate((valid, fileds) => {
                 if (valid) {
                     let uri = dialog.title === '编辑' ? '/permission/account/editAccount' : '/permission/account/addAccount';
-                    http.post(uri, this.form).then(response => {
+                    http.post(BD.realPath + uri, this.form).then(response => {
                         const {rtnFlag, rtnMsg} = response;
                         this.$message.success(rtnMsg || "操作成功");
                         this.formShow = false;
@@ -288,7 +291,7 @@ let bindDialog = new Vue({
             let roleIds = this.checkedRoleData.map(item => {
                 return item.id
             });
-            http.post('/permission/account/bindRoles', {
+            http.post(BD.realPath + '/permission/account/bindRoles', {
                 accountId: this.accountId,
                 roleIds: roleIds.join(",")
             }).then((response) => {
@@ -336,7 +339,7 @@ let bindDialog = new Vue({
 
 function loadRoles() {
     return new Promise((resolve, reject) => {
-        http.post('/permission/role/loadRoles', {status: 'enabled'}).then((response) => {
+        http.post(BD.realPath + '/permission/role/loadRoles', {status: 'enabled'}).then((response) => {
             const {rtnData} = response;
             resolve(rtnData || []);
         }).catch(function (error) {
@@ -347,7 +350,7 @@ function loadRoles() {
 
 function loadLinkRolesByAccId(accountId) {
     return new Promise((resolve, reject) => {
-        http.post('/permission/account/loadLinkRolesByAccId', {accountId: accountId}).then((response) => {
+        http.post(BD.realPath + '/permission/account/loadLinkRolesByAccId', {accountId: accountId}).then((response) => {
             const {rtnData} = response;
             if (rtnData && rtnData.length > 0) {
                 let links = rtnData.map(item => {

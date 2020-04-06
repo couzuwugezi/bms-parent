@@ -7,7 +7,7 @@ let table = new Vue({
     },
     methods: {
         query() {
-            http.post('/permission/dict/loadDicts/1').then(response => {
+            http.post(BD.realPath + '/permission/dict/loadDicts/1').then(response => {
                 const {rtnData} = response;
                 this.tableData = rtnData
             })
@@ -66,7 +66,7 @@ let addForm = new Vue({
         add() {
             this.$refs['addForm'].validate((valid, fields) => {
                 if (valid) {
-                    http.post('/permission/dict/addDicts/1', this.form).then(response => {
+                    http.post(BD.realPath + '/permission/dict/addDicts/1', this.form).then(response => {
                         const {rtnMsg} = response;
                         this.$message.success(rtnMsg);
                         this.form = {

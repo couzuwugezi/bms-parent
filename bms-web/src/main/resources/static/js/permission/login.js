@@ -49,7 +49,7 @@ let drawer = new Vue({
         updatePwd(form) {
             this.$refs[form].validate((valid, fileds) => {
                 if (valid) {
-                    http.post('/permission/account/updatePwd', drawer.form).then(response => {
+                    http.post(BD.realPath + '/permission/account/updatePwd', drawer.form).then(response => {
                         const {rtnMsg} = response;
                         drawer.$message.success(rtnMsg || "操作成功");
                         drawer.show = false;
@@ -92,7 +92,7 @@ function submitForm() {
         return false;
     } else {
         vm.show = false;
-        axios.post(BD.localhostPath + "/check", {
+        axios.post(BD.realPath + "/check", {
             username: username,
             password: password,
             captchaCode: document.getElementById("captcha") ? document.getElementById("captcha").value : null
@@ -112,7 +112,7 @@ function submitForm() {
                     }
                 }
             } else {
-                parent.location.href = "/index.html"
+                parent.location.href = BD.realPath + "/index.html"
             }
         });
     }
