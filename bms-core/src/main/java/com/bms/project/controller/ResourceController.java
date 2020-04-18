@@ -32,9 +32,7 @@ import java.util.stream.Collectors;
  * <p>
  * 管理系统-资源表 前端控制器
  * </p>
- *
- * @author lixiaohua
- * @since 2019-03-18
+ * @author liqiang
  */
 @RestController
 @RequestMapping("/permission/resource")
